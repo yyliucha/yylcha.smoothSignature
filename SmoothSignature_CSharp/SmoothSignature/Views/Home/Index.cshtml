@@ -1,0 +1,205 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div>
+    <div class="singPanel" id="overtimeApp">
+        <table class="cssTb">
+            <tr>
+                <td>部门</td>
+                <td></td>
+                <td>姓名</td>
+                <td>XXX</td>
+                <td>职位</td>
+                <td>.net开发</td>
+            </tr>
+            <tr>
+                <td>加班事由</td>
+                <td colspan="5">测试</td>
+            </tr>
+            <tr>
+                <td>加班时间</td>
+                <td colspan="5">
+                    <span>日期：__2099__年__12__月__31__日（□工作日 □双休日 □国定假日）</span>
+                    <br />
+                    <span>时间：从__08__点到__18__点</span><br />
+                    <span>共计__8__小时</span>
+                </td>
+            </tr>
+            <tr>
+                <td>换算方式</td>
+                <td colspan="5"><span>□调休 □调休延期 □加班费</span></td>
+            </tr>
+            <tr>
+                <td>实际加班时数（由HR填写）</td>
+                <td colspan="3"></td>
+                <td>人力资源部签收</td>
+                <td></td>
+            </tr>
+        </table>
+        <div class="cssWorld">
+            <div style="float: left; width: 600px;margin-top:5px">
+                <div style="float: left">申请部门经理签字：</div>
+                <div class="dvCanvas">
+                    <canvas style="border: 1px solid black"></canvas>
+                </div>
+            </div>
+            <div style="float: right; width: 200px">
+                &nbsp;&nbsp;2099年&nbsp;&nbsp;12月&nbsp;&nbsp;31日
+            </div>
+            <div hidden id="hdnSignature"></div>
+        </div>
+    </div>
+    <div class="cssBtn">
+        <button class="btn btn-primary btn-sm" type="button" id="btnClear">清空签名</button>
+        <button class="btn btn-primary btn-sm" type="button" id="btnUndo">撤销</button>
+        <button class="btn btn-primary btn-sm" type="button" id="btnGeneraCanvas">确定</button>
+        <button class="btn btn-primary btn-sm" type="button" id="btnHandleColor">修改字迹颜色</button>
+        <br />
+        <br />
+        <button class="btn btn-primary" type="button" id="btnDownLoad">生成PDF</button>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script><script src="~/js/smooth-signature.min.js"></script>
+    <script src="~/js/smooth-signature.js">
+    </script><script src="~/js/html2canvas.js"></script><script src="~/js/jspdf.js"></script>
+
+    <script>
+
+        $(function () {
+            //获取定义画布
+            let canvas = document.querySelector("canvas");
+            //画布参数
+            let options = {
+                width: Math.min(window.innerWidth, 370),//宽度
+                height: 200,//高度
+                minWidth: 4,
+                maxWidth: 12,
+                // color: '#1890ff',
+                bgColor: "#f6f6f6",
+            };
+            //初始化smoothsignature画布
+            var signature = null;
+            if (canvas) {
+                signature = new SmoothSignature(canvas, options);
+            }
+
+            //生成pdf时间
+            $("#btnDownLoad").click(function () {
+                //需要打印的html
+                var html = document.getElementById("overtimeApp");
+
+                //使用html2canvas把html元素转换成canvas
+                //jsPDF 把canvas转换成pdf并导出
+                html2canvas(html).then(function (canvas) {
+                    //获取html转成canvas的宽度和高度
+                    var canvasWidth = canvas.width;
+                    var canvasHeight = canvas.height;
+
+                    // 创建PDF文档对象
+                    var pdf = new jsPDF('p', 'pt', 'a4');
+
+                    //通过canvas的宽高计算pdf页面的大小，自适应pdf
+                    var scaleFactor = pdf.internal.pageSize.width / canvasWidth;
+                    var scaleHeight = canvasHeight * scaleFactor;
+
+                    // 将canvas转化为图片并添加至PDF文档
+                    pdf.addImage(canvas.toDataURL('image/png'), 'JPEG', 20, 30, pdf.internal.pageSize.width - 40, scaleHeight);
+
+                    // 下载PDF文档
+                    pdf.save('加班申请单.pdf');
+                });
+            });
+
+            //清除签名画布
+            $("#btnClear").click(function () {
+                if (signature) {
+                    signature.clear();
+                } else {
+                    alert("画布初始化失败！");
+                }
+            });
+
+            //返回上一步
+            $("#btnUndo").click(function () {
+                if (signature) {
+                    signature.undo();
+                } else {
+                    alert("画布初始化失败！");
+                }
+            });
+
+            //把签名画布转换成image标签-未使用
+            $("#btnGeneraCanvas").click(function () {
+                if (signature) {
+                    var pngUrl = signature.getPNG();
+                    var blob = this.dataURLToBlob(pngUrl);
+                    var url = window.URL.createObjectURL(blob);
+                    $("#hdnSignature").attr(`<img src='${url}'></img>`)
+                } else {
+                    alert("画布初始化失败！");
+                }
+            });
+            //更改笔线颜色
+            $("#btnHandleColor").click(function () {
+                if (signature) {
+                    signature.color = "#" + Math.random().toString(16).slice(-6);
+                } else {
+                    alert("画布初始化失败！");
+                }
+                
+            });
+
+        })
+        //把image转换成blob
+        function dataURLToBlob(dataURL) {
+            // Code taken from https://github.com/ebidel/filer.js
+            const parts = dataURL.split(";base64,");
+            const contentType = parts[0].split(":")[1];
+            const raw = window.atob(parts[1]);
+            const rawLength = raw.length;
+            const uInt8Array = new Uint8Array(rawLength);
+
+            for (let i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+
+            return new Blob([uInt8Array], { type: contentType });
+        }
+    </script>
+    <style>
+        .cssSign {
+            height: 200px;
+            width: 440px;
+            float: right;
+        }
+
+        .cssTb {
+            margin: auto;
+            width: 40%;
+        }
+
+        .cssWorld {
+            margin: auto;
+            width: 40%;
+        }
+
+        table,
+        td {
+            border: 1px solid black;
+            width: 500px;
+        }
+
+        .cssBtn {
+            margin-top: 300px;
+            text-align: center;
+        }
+
+        .singPanel {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</div>
+

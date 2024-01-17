@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmoothSignature</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SmoothSignature.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">SmoothSignature</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="smoothSignature">
+                <div class="singPanel" id="overtimeApp">
+                    <table class="cssTb">
+                        <tr>
+                            <td>部门</td>
+                            <td>上海2组</td>
+                            <td>姓名</td>
+                            <td>孙博翔</td>
+                            <td>职位</td>
+                            <td>.net开发</td>
+                        </tr>
+                        <tr>
+                            <td>加班事由</td>
+                            <td colspan="5">测试</td>
+                        </tr>
+                        <tr>
+                            <td>加班时间</td>
+                            <td colspan="5">
+                                <span>日期：__2099__年__12__月__31__日（□工作日 □双休日 □国定假日）</span>
+                                <br />
+                                <span>时间：从__08__点到__18__点（周一至周五：20：30起计算人加班时间）</span><br />
+                                <span>共计__8__小时</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>换算方式</td>
+                            <td colspan="5"><span>□调休 □调休延期 □加班费</span></td>
+                        </tr>
+                        <tr>
+                            <td>实际加班时数（由HR填写）</td>
+                            <td colspan="3"></td>
+                            <td>人力资源部签收</td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <div class="cssWorld">
+                        <div style="float: left; width: 600px">
+                            <div style="float: left">申请部门经理签字：</div>
+                            <div class="cssSign"
+                                 v-on:click="signClick"
+                                 style="
+              background: rgb(246, 246, 246);
+              border: 1px dashed rgb(185, 185, 185);
+              margin: 0.3rem;
+              border-radius: 0.2rem;
+              overflow: hidden;
+            "
+                                 v-html="signContent"></div>
+                        </div>
+                        <div style="float: right; width: 150px">
+                            &nbsp;&nbsp;2099年&nbsp;&nbsp;12月&nbsp;&nbsp;31日
+                        </div>
+                    </div>
+                </div>
+                <div class="cssBtn">
+                    <button type="button" id="btnOk" class="btn btn-primary">确认</button>
+                </div>
+
+                <script>
+                    $(function () {
+                        alert(1);
+                        $("#btnOk").click(function () {
+                            var html = document.getElementById("overtimeApp"); //需要导出的标签页
+                            var pdf = new PdfLoader(html, "加班申请单", "itemClass");
+                            pdf.getPDF();
+                        });
+                    });
+
+                </script>
+
+                <style type="text/css">
+                    .cssSign {
+                        height: 200px;
+                        width: 440px;
+                        float: right;
+                    }
+
+                    .cssTb {
+                        margin: auto;
+                        width: 40%;
+                    }
+
+                    .cssWorld {
+                        margin: auto;
+                        width: 40%;
+                    }
+
+                    table,
+                    td {
+                        border: 1px solid black;
+                        width: 500px;
+                    }
+
+                    .cssBtn {
+                        margin-top: 300px;
+                        text-align: center;
+                    }
+
+                    .singPanel {
+                        width: 100%;
+                        height: 400px;
+                    }
+                </style>
+            </div>
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - SmoothSignature - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/smooth-signature.min.js"></script>
+    <script src="~/js/htmltopdfnew.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
